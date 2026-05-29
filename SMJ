@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>비즈니스 프로젝트 플랫폼 (회원가입 포함)</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --success-color: #16a34a;
+            --bg-color: #f8fafc;
+            --text-color: #1e293b;
+        }
+        body {
+            font-family: 'Pretendard', -apple-system, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        .nav-right {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        .btn:hover { background-color: var(--primary-hover); }
+        .btn-sub { background-color: #f59e0b; }
+        .btn-sub:hover { background-color: #d97706; }
+        .btn-outline {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+        }
+        .btn-outline:hover { background-color: #eff6ff; }
+        
+        /* 섹션 제어 */
+        .page-section { display: none; }
+        .page-section.active { display: block; }
+
+        /* 1. 소개 페이지 */
+        .hero {
+            text-align: center;
+            padding: 80px 20px;
+        }
+        .hero h1 { font-size: 3rem; margin-bottom: 20px; }
+        .hero p { font-size: 1.25rem; color: #64748b; margin-bottom: 40px; }
+        .hero-btns { display: flex; justify-content: center; gap: 15px; }
+
+        /* 2. 인증 박스 (로그인 / 회원가입 공통) */
+        .auth-box {
+            max-width: 400px;
+            margin: 60px auto;
+            padding: 40px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .auth-box h2 { margin-top: 0; }
+        .auth-box input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0 15px 0;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+        .auth-switch {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+        .auth-switch span {
+            color: var(--primary-color);
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        /* 3. 대시보드 */
+        .dashboard { padding: 40px 0; }
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .grid-5 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .feature-card {
+            background: white;
+            padding: 30px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        .status-badge {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 6px 12px;
+            background-color: #f1f5f9;
+            color: #64748b;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+        .status-badge.running {
+            background-color: #dcfce7;
+            color: #15803d;
+        }
+
+        /* 상단 구독 알림 바 */
+        .premium-banner {
+            background-color: #fef3c7;
+            color: #92400e;
+            padding: 12px;
+            text-align: center;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- 상단 헤더 -->
+        <header>
+            <div class="logo">BizProject</div>
+            <div class="nav-right" id="nav-actions">
+                <!-- 로그인 전 버튼 인터페이스 -->
+                <div id="guest-actions">
+                    <button class="btn btn-outline" onclick="showPage('login-page')">로그인</button>
+                    <button class="btn" onclick="showPage('signup-page')">회원가입</button>
+                </div>
+                <!-- 로그인 후 버튼 인터페이스 -->
+                <div id="user-actions" style="display: none; gap: 10px; align-items: center;">
+                    <button class="btn btn-sub" id="sub-nav-btn" onclick="handleSubscribe()">👑 프리미엄 구독하기</button>
+                    <button class="btn" onclick="logout()">로그아웃</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- [페이지 1] 소개 페이지 (로그인 전 랜딩) -->
+        <main id="intro-page" class="page-section active">
+            <section class="hero">
+                <h1>Make your life healthier</h1>
+                <p>Sign in and try our pill's 5 tools.</p>
+                <div class="hero-btns">
+                    <button class="btn" onclick="showPage('signup-page')">지금 가입하기</button>
+                    <button class="btn btn-outline" onclick="showPage('login-page')">이미 계정이 있습니다</button>
+                </div>
+            </section>
+        </main>
+
+        <!-- [페이지 2] 회원가입 페이지 -->
+        <section id="signup-page" class="page-section">
+            <div class="auth-box">
+                <h2>회원가입</h2>
+                <p style="color:#64748b; font-size:0.9rem;">Sign in please..</p>
+                <form onsubmit="handleSignup(event)">
+                    <input type="text" id="signup-id" placeholder="ID" required>
+                    <input type="password" id="signup-pw" placeholder="password" required>
+                    <input type="password" id="signup-pw-confirm" placeholder="Check password" required>
+                    <button type="submit" class="btn" style="width:100%;">Sign in completed</button>
+                </form>
+                <div class="auth-switch">
+                    Do you have an account already? <span onclick="showPage('login-page')">로그인하기</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- [페이지 3] 로그인 페이지 -->
+        <section id="login-page" class="page-section">
+            <div class="auth-box">
+                <h2>log in</h2>
+                <p style="color:#64748b; font-size:0.9rem;">Log in with the ID you have signed in.</p>
+                <form onsubmit="handleLogin(event)">
+                    <input type="text" id="login-id" placeholder="id" required>
+                    <input type="password" id="login-pw" placeholder="password" required>
+                    <button type="submit" class="btn" style="width:100%;">log_in</button>
+                </form>
+                <div class="auth-switch">
+                    처음이신가요? <span onclick="showPage('signup-page')">Sign_in</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- [페이지 4] 대시보드 (로그인 후 진입) -->
+        <section id="dashboard-page" class="page-section">
+            <div id="premium-banner" class="premium-banner">
+                현재 일반 모드로 이용 중입니다. 월 29,000원으로 프리미엄 서버 혜택을 받아보세요!
+                <button class="btn btn-sub" style="padding: 4px 12px; font-size: 0.85rem; margin-left: 10px;" onclick="handleSubscribe()">구독하기</button>
+            </div>
+
+            <div class="dashboard">
+                <div class="dashboard-header">
+                    <div>
+                        <h2>비즈니스 제어판</h2>
+                        <p><span id="welcome-user" style="color:var(--primary-color); font-weight:bold;"></span>, welcome! You can control your pill by clicking one of these 5 buttons.</p>
+                    </div>
+                    <span id="user-status" style="font-weight: bold; color: #64748b;">Status: User</span>
+                </div>
+                
+                <div class="grid-5">
+                    <!-- 버튼 1 -->
+                    <div class="feature-card">
+                        <h3>Observe you body condition</h3>
+                        <button class="btn" onclick="toggleStatus(1)">Click</button>
+                        <div id="status-1" class="status-badge">Observing</div>
+                    </div>
+                    <!-- 버튼 2 -->
+                    <div class="feature-card">
+                        <h3>Break down fats</h3>
+                        <button class="btn" onclick="toggleStatus(2)">Click</button>
+                        <div id="status-2" class="status-badge">Working</div>
+                    </div>
+                    <!-- 버튼 3 -->
+                    <div class="feature-card">
+                        <h3>Cold/symptoms relief</h3>
+                        <button class="btn" onclick="toggleStatus(4)">Click</button>
+                        <div id="status-3" class="status-badge">Working</div>
+                    </div>
+                    <!-- 버튼 4 -->
+                    <div class="feature-card">
+                        <h3>Headeche relief</h3>
+                        <button class="btn" onclick="toggleStatus(4)">Click</button>
+                        <div id="status-4" class="status-badge">Working</div>
+                    </div>
+                    <!--) 버튼 5 -->
+                    <div class="feature-card">
+                        <h3>Stomach/cramps relief</h3>
+                        <button class="btn" onclick="toggleStatus(5)">Click</button>
